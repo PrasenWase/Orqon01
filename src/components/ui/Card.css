@@ -1,0 +1,17 @@
+.card {
+  background-color: var(--color-bg-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-hoverable {
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.card-hoverable:hover {
+  border-color: var(--brand-primary);
+  transform: translateY(-2px);
+}

@@ -1,0 +1,23 @@
+:root {
+  /* Neutral scale (Dark theme as default based on PDF) */
+  --color-bg-base: #09090B; /* Deepest black/grey for main app background */
+  --color-bg-surface: #121214; /* Slightly lighter for sidebar/panels */
+  --color-bg-elevated: #18181B; /* For cards, dropdowns */
+  --color-bg-hover: #27272A;
+  --color-bg-active: #3F3F46;
+
+  /* Text colors */
+  --color-text-primary: #F4F4F5;
+  --color-text-secondary: #A1A1AA;
+  --color-text-muted: #71717A;
+  --color-text-inverse: #09090B; /* Text on light elements */
+
+  /* Borders */
+  --color-border: #27272A;
+  --color-border-hover: #3F3F46;
+
+  /* Orqon AI specific colors */
+  --color-ai-bg: rgba(16, 185, 129, 0.1);
+  --color-ai-border: rgba(16, 185, 129, 0.2);
+  --color-ai-text: #10B981;
+}
