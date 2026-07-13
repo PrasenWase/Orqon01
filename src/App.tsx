@@ -47,6 +47,8 @@ const App: React.FC = () => {
             <Route path="/projects" element={<ProjectsList />} />
             <Route path="/projects/:projectId" element={<ProjectOverview />} />
             <Route path="/tasks/:taskId" element={<TaskDetails />} />
+              <Route path="/discussion" element={<Discussion />} />
+              <Route path="/files" element={<FilesAndDeliverables />} />
             <Route path="/projects/:projectId/discussion" element={<Discussion />} />
             <Route path="/projects/:projectId/files" element={<FilesAndDeliverables />} />
             <Route path="/notifications" element={<Notifications />} />
