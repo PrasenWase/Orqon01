@@ -1,0 +1,432 @@
+/* Command Center Page Styles */
+.cmd-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: calc(100vh - 120px);
+}
+
+/* Header */
+.cmd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+.cmd-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cmd-header-logo {
+  color: var(--brand-primary);
+}
+
+.cmd-page-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+}
+
+.cmd-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Layout */
+.cmd-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: var(--space-6);
+  flex: 1;
+  min-height: 0;
+}
+
+.cmd-skeleton-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: var(--space-6);
+  height: 60vh;
+}
+.cmd-skel-main { height: 100%; border-radius: var(--radius-lg); }
+.cmd-skel-side { height: 100%; border-radius: var(--radius-lg); }
+
+/* Main Chat Area */
+.cmd-chat-area {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.cmd-messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.cmd-msg-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  max-width: 85%;
+}
+
+.cmd-msg-row.user-row {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.cmd-avatar-ai {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--brand-primary);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cmd-msg-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.cmd-msg-row.user-row .cmd-msg-content {
+  align-items: flex-end;
+}
+
+.cmd-msg-meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: 2px;
+}
+
+.cmd-msg-row.user-row .cmd-msg-meta {
+  flex-direction: row-reverse;
+}
+
+.cmd-author {
+  font-size: 13px;
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+}
+
+.cmd-time {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.cmd-bubble {
+  background-color: var(--color-bg-elevated);
+  padding: var(--space-3) var(--space-4);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  line-height: var(--leading-relaxed);
+  border: var(--border-width) solid var(--color-border);
+}
+
+.cmd-msg-row.user-row .cmd-bubble {
+  background-color: var(--brand-primary);
+  color: white;
+  border-color: var(--brand-secondary);
+  border-radius: var(--radius-lg) 0 var(--radius-lg) var(--radius-lg);
+}
+
+.cmd-text {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.cmd-options-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.cmd-option-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  background-color: var(--color-bg-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cmd-option-btn:hover {
+  background-color: var(--color-bg-hover);
+  color: var(--color-text-primary);
+  border-color: var(--color-text-muted);
+}
+
+.cmd-opt-icon {
+  color: var(--brand-primary);
+}
+
+/* Typing Indicator */
+.cmd-typing-indicator {
+  background-color: var(--color-bg-elevated);
+  padding: 12px 16px;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  border: var(--border-width) solid var(--color-border);
+}
+
+.cmd-typing-indicator span {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-text-muted);
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out both;
+}
+
+.cmd-typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.cmd-typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+/* Quick Prompts */
+.cmd-quick-prompts {
+  display: flex;
+  gap: var(--space-2);
+  padding: 0 var(--space-6) var(--space-3) var(--space-6);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.cmd-quick-prompt-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-bg-base);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.cmd-quick-prompt-btn:hover {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border-color: var(--brand-primary);
+}
+
+/* Chat Input */
+.cmd-input-area {
+  padding: var(--space-3) var(--space-6) var(--space-4) var(--space-6);
+  border-top: var(--border-width) solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.cmd-form {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-bg-base);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-1) var(--space-2);
+  transition: border-color var(--transition-fast);
+}
+
+.cmd-form:focus-within {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+}
+
+.cmd-icon-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.cmd-icon-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.cmd-input-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0 var(--space-2);
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  height: 44px;
+}
+
+.cmd-input-field::placeholder {
+  color: var(--color-text-muted);
+}
+
+.cmd-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: var(--brand-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  margin-left: var(--space-1);
+}
+
+.cmd-send-btn:disabled {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.cmd-send-btn:not(:disabled):hover {
+  background-color: var(--brand-secondary);
+}
+
+.cmd-input-footer {
+  text-align: center;
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+}
+
+/* Side Panel */
+.cmd-side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.cmd-side-card {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cmd-side-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cmd-side-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+}
+
+.cmd-context-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cmd-context-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  background-color: var(--color-bg-base);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.cmd-ctx-icon {
+  color: var(--brand-primary);
+  margin-top: 2px;
+}
+
+.cmd-ctx-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cmd-ctx-name {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cmd-ctx-meta {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.cmd-cap-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cmd-cap-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.cmd-cap-list li svg {
+  color: var(--color-text-muted);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .cmd-layout {
+    grid-template-columns: 1fr;
+  }
+  .cmd-side-panel {
+    display: none; /* Hide side panel on tablets/mobile, keep chat focus */
+  }
+}
+
+@media (max-width: 768px) {
+  .cmd-chat-area {
+    min-height: 500px;
+  }
+  .cmd-msg-row {
+    max-width: 95%;
+  }
+}
