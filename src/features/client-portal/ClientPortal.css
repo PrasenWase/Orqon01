@@ -1,0 +1,527 @@
+.client-portal {
+  width: 100%;
+  max-width: var(--container-xl);
+  margin: 0 auto;
+}
+
+.client-portal-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-5);
+}
+
+.client-portal-eyebrow {
+  color: var(--brand-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.client-portal-title {
+  margin-top: var(--space-1);
+  color: var(--color-text-primary);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  line-height: var(--leading-tight);
+}
+
+.client-portal-client {
+  margin-top: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.client-portal-search {
+  width: 260px;
+}
+
+.client-portal-search .input-field {
+  height: 38px;
+}
+
+.client-portal-nav {
+  display: flex;
+  gap: var(--space-6);
+  border-bottom: var(--border-width) solid var(--color-border);
+  margin-bottom: var(--space-6);
+}
+
+.client-portal-nav-item {
+  padding: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  position: relative;
+}
+
+.client-portal-nav-active {
+  color: var(--color-text-primary);
+}
+
+.client-portal-nav-active::after {
+  content: '';
+  height: 2px;
+  background-color: var(--brand-primary);
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+}
+
+.client-portal-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.client-portal-stat-card {
+  display: flex;
+  min-height: 126px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-5);
+}
+
+.client-portal-stat-label {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.client-portal-stat-value {
+  color: var(--color-text-primary);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-none);
+}
+
+.client-portal-deadline {
+  color: var(--color-text-primary);
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+}
+
+.client-portal-stat-detail {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.client-portal-primary-grid,
+.client-portal-secondary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.client-portal-card {
+  padding: var(--space-5);
+}
+
+.client-portal-card h2,
+.client-portal-card h3 {
+  color: var(--color-text-primary);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+}
+
+.client-portal-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.client-portal-card-heading p {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.client-portal-card-heading p strong {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-medium);
+}
+
+.client-portal-progress-figure {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-5);
+  margin: var(--space-6) 0;
+}
+
+.client-portal-progress-figure strong {
+  color: var(--color-text-primary);
+  font-size: var(--text-4xl);
+  font-weight: var(--font-semibold);
+}
+
+.client-portal-timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.client-portal-timeline {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.client-portal-timeline li {
+  border-top: 2px solid var(--color-border);
+  padding-top: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.client-portal-timeline li::before {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin-top: -17px;
+  margin-bottom: var(--space-2);
+  border: 2px solid var(--color-bg-elevated);
+  border-radius: var(--radius-full);
+  background-color: var(--color-border);
+}
+
+.client-portal-timeline .timeline-complete,
+.client-portal-timeline .timeline-current {
+  border-color: var(--brand-primary);
+  color: var(--color-text-secondary);
+}
+
+.client-portal-timeline .timeline-complete::before,
+.client-portal-timeline .timeline-current::before {
+  background-color: var(--brand-primary);
+}
+
+.client-portal-timeline span,
+.client-portal-timeline em {
+  display: block;
+}
+
+.client-portal-timeline em {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-style: normal;
+}
+
+.client-portal-side-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.client-portal-ai-card {
+  border-color: var(--color-ai-border);
+  background: var(--color-ai-bg);
+}
+
+.client-portal-ai-card p {
+  margin-top: var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.client-portal-manager-card h2 {
+  margin-bottom: var(--space-4);
+}
+
+.client-portal-manager {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.client-portal-manager strong,
+.client-portal-manager span {
+  display: block;
+}
+
+.client-portal-manager strong {
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+}
+
+.client-portal-manager span {
+  margin-top: 2px;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.client-portal-deliverables-table {
+  margin-top: var(--space-4);
+}
+
+.client-portal-deliverable-head,
+.client-portal-deliverable-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 2fr) minmax(85px, 0.8fr) minmax(42px, 0.45fr) minmax(48px, 0.55fr) minmax(76px, auto);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.client-portal-deliverable-head {
+  padding: 0 var(--space-2) var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.client-portal-deliverable-row {
+  min-height: 54px;
+  border-top: var(--border-width) solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+}
+
+.client-portal-deliverable-row > span:first-child {
+  color: var(--color-text-primary);
+  font-weight: var(--font-medium);
+}
+
+.client-portal-deliverable-row .btn {
+  justify-self: start;
+}
+
+.client-portal-meetings-card h2 {
+  margin-bottom: var(--space-4);
+}
+
+.client-portal-meeting {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.client-portal-meeting-date {
+  width: 40px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  padding: var(--space-1);
+  text-align: center;
+}
+
+.client-portal-meeting-date span,
+.client-portal-meeting-date strong {
+  display: block;
+}
+
+.client-portal-meeting-date span {
+  color: var(--color-text-muted);
+  font-size: 9px;
+  font-weight: var(--font-semibold);
+}
+
+.client-portal-meeting-date strong {
+  font-size: var(--text-lg);
+  line-height: var(--leading-tight);
+}
+
+.client-portal-meeting > div:last-child strong,
+.client-portal-meeting > div:last-child span {
+  display: block;
+}
+
+.client-portal-meeting > div:last-child strong {
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+}
+
+.client-portal-meeting > div:last-child span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.client-portal-meeting-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.client-portal-activity-card h2 {
+  margin-bottom: var(--space-2);
+}
+
+.client-portal-activity-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.client-portal-activity {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: start;
+  padding: var(--space-4) 0;
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.client-portal-activity > svg {
+  color: var(--brand-primary);
+}
+
+.client-portal-activity strong {
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+}
+
+.client-portal-activity p {
+  margin-top: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.client-portal-activity time {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.client-portal-skeleton-header {
+  margin-bottom: var(--space-6);
+}
+
+.client-portal-skeleton-title {
+  display: block;
+  width: 260px;
+}
+
+.client-portal-skeleton-subtitle {
+  display: block;
+  width: 180px;
+  margin-top: var(--space-2);
+}
+
+.client-portal-skeleton-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.client-portal-skeleton-content {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: var(--space-6);
+}
+
+@media (max-width: 1100px) {
+  .client-portal-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .client-portal-primary-grid,
+  .client-portal-secondary-grid,
+  .client-portal-skeleton-content {
+    grid-template-columns: 1fr;
+  }
+
+  .client-portal-side-stack {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .client-portal-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .client-portal-search {
+    width: 100%;
+  }
+
+  .client-portal-nav {
+    gap: var(--space-4);
+    overflow-x: auto;
+  }
+
+  .client-portal-nav-item {
+    flex: 0 0 auto;
+  }
+
+  .client-portal-side-stack {
+    grid-template-columns: 1fr;
+  }
+
+  .client-portal-deliverables-card {
+    overflow-x: auto;
+  }
+
+  .client-portal-deliverables-table {
+    min-width: 630px;
+  }
+
+  .client-portal-activity {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .client-portal-activity time {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .client-portal-title {
+    font-size: var(--text-2xl);
+  }
+
+  .client-portal-stat-grid,
+  .client-portal-skeleton-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .client-portal-card,
+  .client-portal-stat-card {
+    padding: var(--space-4);
+  }
+
+  .client-portal-progress-figure {
+    gap: var(--space-3);
+  }
+
+  .client-portal-timeline {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .client-portal-timeline li {
+    display: grid;
+    grid-template-columns: minmax(100px, 1fr) auto;
+  }
+
+  .client-portal-timeline li::before {
+    display: none;
+  }
+
+  .client-portal-timeline em {
+    margin: 0;
+    text-align: right;
+  }
+
+  .client-portal-meeting-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
