@@ -7,7 +7,12 @@ import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Progress } from '../../components/ui/Progress';
 import { AvatarGroup, Avatar } from '../../components/ui/Avatar';
-import { mockProjects, mockActivity, mockTasks, type Project } from '../../services/mockData';
+import { mockActivity } from '../../services/mockData';
+import type { Project } from '../../services/mockData';
+import { useProjects } from '../../hooks/useProjects';
+import { useTasks } from '../../hooks/useTasks';
+import { ProjectModal } from '../../components/project/ProjectModal';
+import { TaskModal } from '../../components/task/TaskModal';
 import './Dashboard.css';
 
 type FilterTab = 'all' | 'active' | 'at-risk' | 'completed' | 'archived';
@@ -47,9 +52,13 @@ const cardVariants: Variants = {
 const Dashboard: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const { projects } = useProjects();
+  const { tasks } = useTasks();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
-  const filteredProjects = filterProjects(mockProjects, activeFilter, searchQuery);
-  const atRiskCount = mockProjects.filter((p) => p.status === 'at-risk' || p.status === 'delayed').length;
+  const filteredProjects = filterProjects(projects, activeFilter, searchQuery);
+  const atRiskCount = projects.filter((p) => p.status === 'at-risk' || p.status === 'delayed').length;
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
@@ -60,10 +69,13 @@ const Dashboard: React.FC = () => {
           <h1 className="dashboard-page-title">Projects</h1>
           <p className="dashboard-page-subtitle">Manage and monitor every project from one place.</p>
         </div>
-        <Button leftIcon={<Plus size={16} />} aria-label="Create new project">
+        <Button leftIcon={<Plus size={16} />} aria-label="Create new project" onClick={() => setIsModalOpen(true)}>
           New Project
         </Button>
       </div>
+      
+      <ProjectModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <TaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} />
 
       {/* ── AI Banner ── */}
       <div className="ai-banner" role="region" aria-label="AI Insights">
@@ -216,10 +228,13 @@ const Dashboard: React.FC = () => {
         <div className="panel">
           <div className="panel-header">
             <h2 className="panel-title">Recent Tasks</h2>
-            <Link to="/projects" className="panel-see-all">See all</Link>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <Button size="sm" variant="ghost" onClick={() => setIsTaskModalOpen(true)}>New Task</Button>
+              <Link to="/projects" className="panel-see-all">See all</Link>
+            </div>
           </div>
           <ul className="task-list">
-            {mockTasks.slice(0, 5).map((task) => (
+            {tasks.slice(0, 5).map((task) => (
               <li key={task.id} className="task-item">
                 <div className={`task-priority-bar priority-${task.priority}`} aria-label={`Priority: ${task.priority}`} />
                 <div className="task-body">

@@ -22,10 +22,10 @@ import { Avatar } from '../../components/ui/Avatar';
 import { Skeleton } from '../../components/ui/Skeleton';
 
 import { 
-  mockTasks, 
   mockUsers,
   type TaskStatus
 } from '../../services/mockData';
+import { useTasks } from '../../hooks/useTasks';
 
 import './TaskDetails.css';
 
@@ -98,7 +98,8 @@ const TaskDetails: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
   
-  const task = mockTasks.find((t) => t.id === taskId);
+  const { tasks } = useTasks();
+  const task = tasks.find((t) => t.id === taskId);
   const subtasks = task ? (mockSubtasks[task.id] || []) : [];
   const attachments = task ? (mockAttachments[task.id] || []) : [];
   const comments = task ? (mockComments[task.id] || []) : [];

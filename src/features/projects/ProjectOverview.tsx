@@ -20,11 +20,12 @@ import { Avatar, AvatarGroup } from '../../components/ui/Avatar';
 import { Skeleton } from '../../components/ui/Skeleton';
 
 import { 
-  mockProjects, 
-  mockTasks, 
   mockActivity,
   type ProjectStatus 
 } from '../../services/mockData';
+import { useProjects } from '../../hooks/useProjects';
+import { useTasks } from '../../hooks/useTasks';
+import { TaskModal } from '../../components/task/TaskModal';
 
 import './ProjectOverview.css';
 
@@ -53,10 +54,14 @@ const ProjectOverview: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   
-  const project = mockProjects.find((p) => p.id === projectId);
+  const { projects } = useProjects();
+  const { tasks } = useTasks();
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  
+  const project = projects.find((p) => p.id === projectId);
   
   // Filter mock data for this specific project
-  const projectTasks = mockTasks.filter(t => t.projectId === projectId);
+  const projectTasks = tasks.filter(t => t.projectId === projectId);
   const projectActivity = mockActivity.filter(a => a.projectTitle === project?.title);
 
   useEffect(() => {
@@ -186,7 +191,10 @@ const ProjectOverview: React.FC = () => {
               <Card className="po-card">
                 <div className="po-card-header">
                   <h2 className="po-section-title">Recent Tasks</h2>
-                  <Button variant="ghost" size="sm">View All</Button>
+                  <div className="po-actions-group" style={{ display: 'flex', gap: '0.5rem' }}>
+                    <Button variant="ghost" size="sm" onClick={() => setIsTaskModalOpen(true)}>New Task</Button>
+                    <Button variant="ghost" size="sm">View All</Button>
+                  </div>
                 </div>
                 
                 {projectTasks.length === 0 ? (
@@ -298,6 +306,7 @@ const ProjectOverview: React.FC = () => {
           </div>
         </div>
       )}
+      <TaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} />
     </motion.div>
   );
 };

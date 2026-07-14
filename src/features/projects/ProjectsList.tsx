@@ -4,7 +4,9 @@ import { Plus, Search, ChevronDown, LayoutGrid, List } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { ProjectCard } from '../../components/ui/ProjectCard';
 import { SkeletonProjectCard } from '../../components/ui/Skeleton';
-import { mockProjects, type Project } from '../../services/mockData';
+import type { Project } from '../../services/mockData';
+import { useProjects } from '../../hooks/useProjects';
+import { ProjectModal } from '../../components/project/ProjectModal';
 import './ProjectsList.css';
 
 type FilterTab = 'all' | 'active' | 'at-risk' | 'completed' | 'archived';
@@ -46,6 +48,8 @@ const ProjectsList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [isLoading, setIsLoading] = useState(true);
+  const { projects } = useProjects();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Simulate loading state for skeleton demonstration
   useEffect(() => {
@@ -56,7 +60,7 @@ const ProjectsList: React.FC = () => {
     return () => clearTimeout(timer);
   }, [activeFilter, searchQuery, viewMode]);
 
-  const filteredProjects = filterProjects(mockProjects, activeFilter, searchQuery);
+  const filteredProjects = filterProjects(projects, activeFilter, searchQuery);
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="projects-page">
@@ -67,7 +71,7 @@ const ProjectsList: React.FC = () => {
           <h1 className="projects-page-title">All Projects</h1>
           <p className="projects-page-subtitle">View and manage all your team's projects.</p>
         </div>
-        <Button leftIcon={<Plus size={16} />}>New Project</Button>
+        <Button leftIcon={<Plus size={16} />} onClick={() => setIsModalOpen(true)}>New Project</Button>
       </div>
 
       {/* ── Filters & Controls ── */}
@@ -82,7 +86,7 @@ const ProjectsList: React.FC = () => {
             >
               {tab.label}
               <span className="tab-count">
-                {filterProjects(mockProjects, tab.value, '').length}
+                {filterProjects(projects, tab.value, '').length}
               </span>
             </button>
           ))}
@@ -163,6 +167,7 @@ const ProjectsList: React.FC = () => {
         </motion.div>
       )}
 
+      <ProjectModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </motion.div>
   );
 };
