@@ -1,24 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { mockUsers } from '../../services/mockData';
-import type { User, Project } from '../../services/mockData';
+import type { Project, ProjectStatus, TaskPriority, User } from '../../services/mockData';
 import { useProjects } from '../../hooks/useProjects';
 import './ProjectModal.css';
 
 interface ProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
+  project?: Project;
 }
 
-export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) => {
-  const { addProject } = useProjects();
+function formatDateForInput(date: string): string {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return '';
+  const year = parsedDate.getFullYear();
+  const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+  const day = String(parsedDate.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, project }) => {
+  const { addProject, updateProject } = useProjects();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('healthy'); // healthy, at-risk, delayed, completed
-  const [priority, setPriority] = useState('medium');
+  const [status, setStatus] = useState<ProjectStatus>('healthy');
+  const [priority, setPriority] = useState<TaskPriority>('medium');
   const [deadline, setDeadline] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [error, setError] = useState('');
@@ -33,6 +44,22 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) =
     setError('');
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!project) {
+      resetForm();
+      return;
+    }
+
+    setTitle(project.title);
+    setDescription(project.description);
+    setStatus(project.status);
+    setPriority(project.priority ?? 'medium');
+    setDeadline(formatDateForInput(project.deadline));
+    setSelectedUsers(project.team.map((user) => user.id));
+    setError('');
+  }, [isOpen, project]);
+
   const handleClose = () => {
     resetForm();
     onClose();
@@ -45,18 +72,24 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) =
       return;
     }
 
-    const newProject: Project = {
-      id: `p_${Date.now()}`,
+    const projectData: Project = {
+      id: project?.id ?? `p_${Date.now()}`,
       title,
       description,
-      status: status as any,
-      progress: 0,
-      openTasks: 0,
+      status,
+      priority,
+      progress: project?.progress ?? 0,
+      openTasks: project?.openTasks ?? 0,
       deadline: deadline || new Date().toISOString().split('T')[0],
       team: selectedUsers.map(id => Object.values(mockUsers).find(u => u.id === id) as User).filter(Boolean),
+      aiRecommendation: project?.aiRecommendation,
     };
 
-    addProject(newProject);
+    if (project) {
+      updateProject(projectData);
+    } else {
+      addProject(projectData);
+    }
     
     handleClose();
   };
@@ -85,7 +118,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) =
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
           >
             <div className="modal-header">
-              <h2>New Project</h2>
+              <h2>{project ? 'Edit Project' : 'New Project'}</h2>
               <button className="modal-close" onClick={handleClose} aria-label="Close new project modal"><X size={20} /></button>
             </div>
             
@@ -113,7 +146,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) =
               <div className="form-row">
                 <div className="input-wrapper">
                   <label className="input-label">Status</label>
-                  <select className="input-field select-field" value={status} onChange={(e) => setStatus(e.target.value)}>
+                  <select className="input-field select-field" value={status} onChange={(e) => setStatus(e.target.value as ProjectStatus)}>
                     <option value="healthy">Planning</option>
                     <option value="at-risk">In Progress</option>
                     <option value="delayed">Review</option>
@@ -123,7 +156,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) =
                 
                 <div className="input-wrapper">
                   <label className="input-label">Priority</label>
-                  <select className="input-field select-field" value={priority} onChange={(e) => setPriority(e.target.value)}>
+                  <select className="input-field select-field" value={priority} onChange={(e) => setPriority(e.target.value as TaskPriority)}>
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
                     <option value="high">High</option>
@@ -156,7 +189,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) =
 
               <div className="modal-actions">
                 <Button variant="secondary" onClick={handleClose} type="button">Cancel</Button>
-                <Button variant="primary" type="submit">Create Project</Button>
+                <Button variant="primary" type="submit">{project ? 'Save Project' : 'Create Project'}</Button>
               </div>
             </form>
           </motion.div>

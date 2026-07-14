@@ -59,5 +59,21 @@ export function useProjects() {
     window.dispatchEvent(new Event('orqon-projects-updated'));
   };
 
-  return { projects, addProject };
+  const updateProject = (project: Project) => {
+    const updated = projects.map((currentProject) =>
+      currentProject.id === project.id ? project : currentProject
+    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    setProjects(updated);
+    window.dispatchEvent(new Event('orqon-projects-updated'));
+  };
+
+  const deleteProject = (projectId: string) => {
+    const updated = projects.filter((project) => project.id !== projectId);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    setProjects(updated);
+    window.dispatchEvent(new Event('orqon-projects-updated'));
+  };
+
+  return { projects, addProject, updateProject, deleteProject };
 }

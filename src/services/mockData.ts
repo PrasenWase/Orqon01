@@ -56,6 +56,7 @@ export interface Project {
   openTasks: number;
   deadline: string;
   team: User[];
+  priority?: TaskPriority;
   aiRecommendation?: {
     text: string;
     actionLabel: string;

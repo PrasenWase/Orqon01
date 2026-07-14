@@ -26,6 +26,7 @@ import {
 import { useProjects } from '../../hooks/useProjects';
 import { useTasks } from '../../hooks/useTasks';
 import { TaskModal } from '../../components/task/TaskModal';
+import { ProjectModal } from '../../components/project/ProjectModal';
 
 import './ProjectOverview.css';
 
@@ -49,14 +50,39 @@ function badgeVariant(
   return 'delayed';
 }
 
+async function copyCurrentProjectLink(): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      return;
+    } catch {
+      // Fall back for browsers that deny async clipboard access.
+    }
+  }
+
+  const textArea = document.createElement('textarea');
+  textArea.value = window.location.href;
+  textArea.style.position = 'fixed';
+  textArea.style.opacity = '0';
+  document.body.appendChild(textArea);
+  textArea.select();
+  const copied = document.execCommand('copy');
+  document.body.removeChild(textArea);
+  if (!copied) throw new Error('Unable to copy project link');
+}
+
 const ProjectOverview: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   
-  const { projects } = useProjects();
+  const { projects, deleteProject } = useProjects();
   const { tasks } = useTasks();
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
+  const [showShareToast, setShowShareToast] = useState(false);
   
   const project = projects.find((p) => p.id === projectId);
   
@@ -70,6 +96,23 @@ const ProjectOverview: React.FC = () => {
     const timer = setTimeout(() => setIsLoading(false), 600);
     return () => clearTimeout(timer);
   }, [projectId]);
+
+  const handleShare = async () => {
+    try {
+      await copyCurrentProjectLink();
+      setShowShareToast(true);
+      window.setTimeout(() => setShowShareToast(false), 2500);
+    } catch {
+      // Clipboard access can be denied by browser settings.
+    }
+  };
+
+  const handleDelete = () => {
+    if (!project) return;
+    deleteProject(project.id);
+    setIsDeleteConfirmationOpen(false);
+    navigate('/projects');
+  };
 
   if (!project && !isLoading) {
     return (
@@ -107,11 +150,35 @@ const ProjectOverview: React.FC = () => {
         </div>
         
         <div className="po-header-actions">
-          <Button variant="outline">Share</Button>
-          <Button>Edit Project</Button>
-          <Button variant="ghost" className="po-more-btn" aria-label="More options">
-            <MoreHorizontal size={18} />
-          </Button>
+          <Button variant="outline" onClick={handleShare} disabled={!project}>Share</Button>
+          <Button onClick={() => setIsProjectModalOpen(true)} disabled={!project}>Edit Project</Button>
+          <div className="po-more-menu-wrap">
+            <Button
+              variant="ghost"
+              className="po-more-btn"
+              aria-label="More options"
+              aria-expanded={isMoreMenuOpen}
+              onClick={() => setIsMoreMenuOpen((isOpen) => !isOpen)}
+              disabled={!project}
+            >
+              <MoreHorizontal size={18} />
+            </Button>
+            {isMoreMenuOpen && (
+              <div className="po-more-menu" role="menu" aria-label="Project actions">
+                <button
+                  type="button"
+                  className="po-more-menu-item danger"
+                  onClick={() => {
+                    setIsMoreMenuOpen(false);
+                    setIsDeleteConfirmationOpen(true);
+                  }}
+                  role="menuitem"
+                >
+                  Delete Project
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -307,6 +374,27 @@ const ProjectOverview: React.FC = () => {
         </div>
       )}
       <TaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} />
+      <ProjectModal
+        isOpen={isProjectModalOpen}
+        onClose={() => setIsProjectModalOpen(false)}
+        project={project}
+      />
+
+      {isDeleteConfirmationOpen && (
+        <>
+          <div className="modal-overlay" onClick={() => setIsDeleteConfirmationOpen(false)} />
+          <Card className="po-delete-dialog" role="dialog" aria-modal="true" aria-labelledby="delete-project-title">
+            <h2 id="delete-project-title">Delete this project?</h2>
+            <p>This action cannot be undone.</p>
+            <div className="po-delete-actions">
+              <Button variant="secondary" onClick={() => setIsDeleteConfirmationOpen(false)}>Cancel</Button>
+              <Button onClick={handleDelete}>Delete</Button>
+            </div>
+          </Card>
+        </>
+      )}
+
+      {showShareToast && <div className="po-share-toast" role="status">Project link copied.</div>}
     </motion.div>
   );
 };
