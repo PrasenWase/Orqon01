@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { mockUsers } from '../services/mockData';
 import type { User } from '../services/mockData';
 
@@ -14,8 +14,17 @@ export interface FileItem {
   version: string;
   isDeliverable: boolean;
   projectId?: string;
-  objectUrl?: string; // transient for current session
+  projectTitle?: string;
+  objectUrl?: string;
 }
+
+interface UploadContext {
+  projectId?: string;
+  projectTitle?: string;
+  uploadedBy?: User;
+}
+
+const STORAGE_KEY = 'orqon_files_v1';
 
 const initialMockFiles: FileItem[] = [
   { id: 'f1', name: 'Product_Requirements_v2.pdf', type: 'document', size: '2.4 MB', modified: '2 hours ago', owner: mockUsers.sarah, version: 'v2.1', isDeliverable: true },
@@ -27,88 +36,100 @@ const initialMockFiles: FileItem[] = [
   { id: 'f7', name: 'Meeting_Notes_Aug.docx', type: 'document', size: '120 KB', modified: 'Aug 8', owner: mockUsers.sarah, version: 'v1.0', isDeliverable: false },
 ];
 
-const STORAGE_KEY = 'orqon_files_v1';
+function readFiles(): FileItem[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) as FileItem[] : initialMockFiles;
+  } catch {
+    return initialMockFiles;
+  }
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  const units = ['KB', 'MB', 'GB'];
+  const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)) - 1, units.length - 1);
+  return `${(bytes / 1024 ** (index + 1)).toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+}
+
+function getFileType(file: File): FileType {
+  if (file.type.startsWith('image/')) return 'image';
+  if (/\.(zip|rar|7z|tar|gz)$/i.test(file.name)) return 'archive';
+  if (/\.(fig|sketch|xd)$/i.test(file.name)) return 'design';
+  return 'document';
+}
 
 export function useFiles(projectId?: string) {
-  const [files, setFiles] = useState<FileItem[]>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch (e) {
-        return initialMockFiles;
-      }
-    }
-    return initialMockFiles;
-  });
+  const [files, setFiles] = useState<FileItem[]>(readFiles);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
+    if (!localStorage.getItem(STORAGE_KEY)) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(initialMockFiles));
     }
 
-    const handleStorage = () => {
-      const updated = localStorage.getItem(STORAGE_KEY);
-      if (updated) {
-        try {
-          const parsed = JSON.parse(updated) as FileItem[];
-          setFiles(prev => {
-            return parsed.map(p => {
-              const existing = prev.find(pf => pf.id === p.id);
-              return existing?.objectUrl ? { ...p, objectUrl: existing.objectUrl } : p;
-            });
-          });
-        } catch (e) {
-          // ignore
-        }
-      }
+    const syncFiles = () => {
+      const storedFiles = readFiles();
+      setFiles((currentFiles) => storedFiles.map((file) => {
+        const currentFile = currentFiles.find((item) => item.id === file.id);
+        return currentFile?.objectUrl ? { ...file, objectUrl: currentFile.objectUrl } : file;
+      }));
     };
-
-    window.addEventListener('storage', handleStorage);
-    window.addEventListener('orqon-files-updated', handleStorage);
-
+    window.addEventListener('storage', syncFiles);
+    window.addEventListener('orqon-files-updated', syncFiles);
     return () => {
-      window.removeEventListener('storage', handleStorage);
-      window.removeEventListener('orqon-files-updated', handleStorage);
+      window.removeEventListener('storage', syncFiles);
+      window.removeEventListener('orqon-files-updated', syncFiles);
     };
   }, []);
 
-  const addFile = (file: FileItem) => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    let current = initialMockFiles;
-    if (stored) {
-      try {
-        current = JSON.parse(stored);
-      } catch (e) {}
-    }
-    
-    const toSave = { ...file };
-    delete toSave.objectUrl;
-
-    const updated = [toSave, ...current];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    
-    setFiles(prev => [file, ...prev]);
+  const persistFiles = (updated: FileItem[]) => {
+    const persistable = updated.map(({ objectUrl: _objectUrl, ...file }) => file);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(persistable));
+    setFiles(updated);
     window.dispatchEvent(new Event('orqon-files-updated'));
+  };
+
+  const uploadFiles = (selectedFiles: FileList | File[], context: UploadContext = {}) => {
+    const uploadedBy = context.uploadedBy ?? mockUsers.sarah;
+    const modified = new Date().toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    const newFiles = Array.from(selectedFiles).map((file): FileItem => ({
+      id: `file-${crypto.randomUUID()}`,
+      name: file.name,
+      type: getFileType(file),
+      size: formatFileSize(file.size),
+      modified,
+      owner: uploadedBy,
+      version: 'v1.0',
+      isDeliverable: false,
+      projectId: context.projectId,
+      projectTitle: context.projectTitle,
+      objectUrl: URL.createObjectURL(file),
+    }));
+
+    if (newFiles.length) persistFiles([...newFiles, ...files]);
   };
 
   const deleteFile = (id: string) => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    let current = initialMockFiles;
-    if (stored) {
-      try {
-        current = JSON.parse(stored);
-      } catch (e) {}
-    }
-    const updated = current.filter(f => f.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    
-    setFiles(prev => prev.filter(f => f.id !== id));
-    window.dispatchEvent(new Event('orqon-files-updated'));
+    const file = files.find((item) => item.id === id);
+    if (file?.objectUrl) URL.revokeObjectURL(file.objectUrl);
+    persistFiles(files.filter((item) => item.id !== id));
   };
 
-  const projectFiles = projectId ? files.filter(f => f.projectId === projectId || f.id.startsWith('f')) : files;
+  const downloadFile = (file: FileItem) => {
+    if (!file.objectUrl) return;
+    const link = document.createElement('a');
+    link.href = file.objectUrl;
+    link.download = file.name;
+    link.click();
+  };
 
-  return { files: projectFiles, addFile, deleteFile };
+  const visibleFiles = projectId
+    ? files.filter((file) => !file.projectId || file.projectId === projectId)
+    : files;
+
+  return { files: visibleFiles, uploadFiles, deleteFile, downloadFile };
 }

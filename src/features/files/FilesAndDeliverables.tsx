@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import { 
@@ -12,8 +12,8 @@ import {
   FileImage,
   FileArchive,
   FileBox,
-  MoreVertical,
   Download,
+  Trash2,
   FolderOpen,
   Sparkles,
   AlertTriangle,
@@ -27,33 +27,11 @@ import { Badge } from '../../components/ui/Badge';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { Progress } from '../../components/ui/Progress';
 
-import { mockProjects, mockUsers } from '../../services/mockData';
+import { useFiles, type FileType } from '../../hooks/useFiles';
+import { useProjects } from '../../hooks/useProjects';
 import './FilesAndDeliverables.css';
 
-// ---- Local Mock Data ----
-type FileType = 'document' | 'image' | 'archive' | 'design';
 type ViewMode = 'grid' | 'list';
-
-interface FileItem {
-  id: string;
-  name: string;
-  type: FileType;
-  size: string;
-  modified: string;
-  owner: typeof mockUsers['sarah'];
-  version: string;
-  isDeliverable: boolean;
-}
-
-const mockFiles: FileItem[] = [
-  { id: 'f1', name: 'Product_Requirements_v2.pdf', type: 'document', size: '2.4 MB', modified: '2 hours ago', owner: mockUsers.sarah, version: 'v2.1', isDeliverable: true },
-  { id: 'f2', name: 'UI_Components_Library.fig', type: 'design', size: '14.2 MB', modified: 'Yesterday', owner: mockUsers.elena, version: 'v4.0', isDeliverable: true },
-  { id: 'f3', name: 'API_Documentation.md', type: 'document', size: '45 KB', modified: '3 days ago', owner: mockUsers.rahul, version: 'v1.0', isDeliverable: false },
-  { id: 'f4', name: 'Q3_Financial_Projections.xlsx', type: 'document', size: '1.1 MB', modified: 'Last week', owner: mockUsers.marcus, version: 'v1.2', isDeliverable: true },
-  { id: 'f5', name: 'Hero_Assets.zip', type: 'archive', size: '42 MB', modified: 'Aug 14', owner: mockUsers.elena, version: 'v1.0', isDeliverable: false },
-  { id: 'f6', name: 'Logo_Pack_Final.zip', type: 'archive', size: '8.4 MB', modified: 'Aug 10', owner: mockUsers.priya, version: 'v1.0', isDeliverable: false },
-  { id: 'f7', name: 'Meeting_Notes_Aug.docx', type: 'document', size: '120 KB', modified: 'Aug 8', owner: mockUsers.sarah, version: 'v1.0', isDeliverable: false },
-];
 
 const getFileIcon = (type: FileType) => {
   switch (type) {
@@ -85,7 +63,10 @@ const itemVariants: Variants = {
 
 const FilesAndDeliverables: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const project = mockProjects.find(p => p.id === projectId);
+  const { projects } = useProjects();
+  const project = projects.find(p => p.id === projectId);
+  const { files, uploadFiles, deleteFile, downloadFile } = useFiles(projectId);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -99,7 +80,7 @@ const FilesAndDeliverables: React.FC = () => {
   }, [projectId]);
 
   // Filtering
-  const filteredFiles = mockFiles.filter(f => {
+  const filteredFiles = files.filter(f => {
     const matchesSearch = f.name.toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
     
@@ -110,8 +91,25 @@ const FilesAndDeliverables: React.FC = () => {
     return true;
   });
 
-  const recentUploads = mockFiles.slice(0, 3);
-  const deliverables = mockFiles.filter(f => f.isDeliverable);
+  const recentUploads = files.slice(0, 3);
+  const deliverables = files.filter(f => f.isDeliverable);
+
+  const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files?.length) return;
+    uploadFiles(event.target.files, {
+      projectId,
+      projectTitle: project?.title,
+    });
+    event.target.value = '';
+  };
+
+  const handleDownload = (file: Parameters<typeof downloadFile>[0]) => {
+    if (file.objectUrl) {
+      downloadFile(file);
+      return;
+    }
+    window.alert('This sample file has no local download available. Newly uploaded files can be downloaded during this session.');
+  };
 
   return (
     <motion.div 
@@ -134,7 +132,14 @@ const FilesAndDeliverables: React.FC = () => {
         </div>
         <div className="files-header-actions">
           <Button variant="outline" leftIcon={<FolderOpen size={16} />}>New Folder</Button>
-          <Button leftIcon={<UploadCloud size={16} />}>Upload File</Button>
+          <Button leftIcon={<UploadCloud size={16} />} onClick={() => fileInputRef.current?.click()}>Upload File</Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            className="files-native-input"
+            onChange={handleFileSelection}
+          />
         </div>
       </div>
 
@@ -253,8 +258,9 @@ const FilesAndDeliverables: React.FC = () => {
                   <div className="flist-header">
                     <div className="flist-h-name">Name</div>
                     <div className="flist-h-size">Size</div>
-                    <div className="flist-h-date">Modified</div>
-                    <div className="flist-h-owner">Owner</div>
+                    <div className="flist-h-date">Uploaded</div>
+                    <div className="flist-h-project">Project</div>
+                    <div className="flist-h-owner">Uploaded by</div>
                     <div className="flist-h-action"></div>
                   </div>
                 )}
@@ -276,13 +282,14 @@ const FilesAndDeliverables: React.FC = () => {
                         </div>
                         <div className="flist-size-col">{file.size}</div>
                         <div className="flist-date-col">{file.modified}</div>
+                        <div className="flist-project-col">{file.projectTitle || project?.title || 'All projects'}</div>
                         <div className="flist-owner-col">
                           <Avatar src={file.owner.avatarUrl} alt={file.owner.name} fallback={file.owner.initials} size="sm" />
                           <span>{file.owner.name}</span>
                         </div>
                         <div className="flist-action-col">
-                          <button className="file-action-btn"><Download size={14} /></button>
-                          <button className="file-action-btn"><MoreVertical size={14} /></button>
+                          <button className="file-action-btn" onClick={() => handleDownload(file)} aria-label={`Download ${file.name}`}><Download size={14} /></button>
+                          <button className="file-action-btn" onClick={() => deleteFile(file.id)} aria-label={`Delete ${file.name}`}><Trash2 size={14} /></button>
                         </div>
                       </motion.div>
                     );
@@ -296,7 +303,10 @@ const FilesAndDeliverables: React.FC = () => {
                           <div className={`file-icon-box ${typeClass}`}>
                             {getFileIcon(file.type)}
                           </div>
-                          <button className="file-action-btn"><MoreVertical size={16} /></button>
+                          <div className="fcard-actions">
+                            <button className="file-action-btn" onClick={() => handleDownload(file)} aria-label={`Download ${file.name}`}><Download size={16} /></button>
+                            <button className="file-action-btn" onClick={() => deleteFile(file.id)} aria-label={`Delete ${file.name}`}><Trash2 size={16} /></button>
+                          </div>
                         </div>
                         <div className="fcard-body">
                           <h3 className="fcard-name" title={file.name}>{file.name}</h3>
@@ -305,11 +315,15 @@ const FilesAndDeliverables: React.FC = () => {
                             <span>•</span>
                             <span>{file.size}</span>
                           </div>
+                          <div className="fcard-project">{file.projectTitle || project?.title || 'All projects'}</div>
                         </div>
                         <div className="fcard-footer">
                           <div className="fcard-owner">
                             <Avatar src={file.owner.avatarUrl} alt={file.owner.name} fallback={file.owner.initials} size="sm" />
-                            <span className="fcard-date">{file.modified}</span>
+                            <div className="fcard-upload-meta">
+                              <span>{file.owner.name}</span>
+                              <span className="fcard-date">{file.modified}</span>
+                            </div>
                           </div>
                         </div>
                       </Card>
