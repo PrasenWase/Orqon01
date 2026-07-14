@@ -138,17 +138,12 @@ npm run build
 ---
 
 ## Screenshots
+Landing page : <img width="1366" height="603" alt="O landing page" src="https://github.com/user-attachments/assets/e56ae0fa-090b-478f-9d16-a13e4fa94f05" />
+Dashboard : <img width="1366" height="606" alt="O dashboard" src="https://github.com/user-attachments/assets/9c8c0596-1ea7-42f8-a176-decd95266b12" />
+Project page : <img width="1365" height="602" alt="O project" src="https://github.com/user-attachments/assets/23ca63dc-5916-4307-8b99-73bd8657b6a3" />
+Files and Deliverables : <img width="1361" height="596" alt="O files" src="https://github.com/user-attachments/assets/15f4cb73-a484-4d6a-a687-b1ca9c76a1c2" />
 
-Add screenshots here after deployment.
 
-- Dashboard
-- Projects
-- Notifications
-- Client Portal
-- Settings
-- Orqon AI
-
----
 
 ## Future Enhancements
 
