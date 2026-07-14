@@ -11,6 +11,7 @@ import './ProjectsList.css';
 
 type FilterTab = 'all' | 'active' | 'at-risk' | 'completed' | 'archived';
 type ViewMode = 'grid' | 'list';
+type SortOption = 'newest' | 'oldest' | 'name' | 'progress';
 
 const FILTER_TABS: { label: string; value: FilterTab }[] = [
   { label: 'All Projects', value: 'all' },
@@ -33,6 +34,21 @@ function filterProjects(projects: Project[], filter: FilterTab, query: string): 
   });
 }
 
+const SORT_LABELS: Record<SortOption, string> = {
+  newest: 'Newest',
+  oldest: 'Oldest',
+  name: 'Name',
+  progress: 'Progress',
+};
+
+function sortProjects(projects: Project[], sort: SortOption): Project[] {
+  const sortedProjects = [...projects];
+  if (sort === 'newest') return sortedProjects;
+  if (sort === 'oldest') return sortedProjects.reverse();
+  if (sort === 'name') return sortedProjects.sort((a, b) => a.title.localeCompare(b.title));
+  return sortedProjects.sort((a, b) => b.progress - a.progress);
+}
+
 const containerVariants: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.08 } },
@@ -47,6 +63,8 @@ const ProjectsList: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [sortOption, setSortOption] = useState<SortOption>('newest');
+  const [isSortOpen, setIsSortOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { projects } = useProjects();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,7 +78,10 @@ const ProjectsList: React.FC = () => {
     return () => clearTimeout(timer);
   }, [activeFilter, searchQuery, viewMode]);
 
-  const filteredProjects = filterProjects(projects, activeFilter, searchQuery);
+  const filteredProjects = sortProjects(
+    filterProjects(projects, activeFilter, searchQuery),
+    sortOption
+  );
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="projects-page">
@@ -122,9 +143,36 @@ const ProjectsList: React.FC = () => {
             </button>
           </div>
 
-          <Button variant="ghost" rightIcon={<ChevronDown size={14} />}>
-            Sort: Newest
-          </Button>
+          <div className="projects-sort">
+            <Button
+              variant="ghost"
+              rightIcon={<ChevronDown size={14} />}
+              onClick={() => setIsSortOpen((isOpen) => !isOpen)}
+              aria-expanded={isSortOpen}
+              aria-haspopup="menu"
+            >
+              Sort: {SORT_LABELS[sortOption]}
+            </Button>
+            {isSortOpen && (
+              <div className="projects-sort-menu" role="menu" aria-label="Sort projects">
+                {(Object.keys(SORT_LABELS) as SortOption[]).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    className={`projects-sort-option${sortOption === option ? ' active' : ''}`}
+                    onClick={() => {
+                      setSortOption(option);
+                      setIsSortOpen(false);
+                    }}
+                    role="menuitemradio"
+                    aria-checked={sortOption === option}
+                  >
+                    {SORT_LABELS[option]}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

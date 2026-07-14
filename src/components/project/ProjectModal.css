@@ -20,7 +20,9 @@
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   z-index: calc(var(--z-modal) + 1);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
@@ -31,6 +33,7 @@
   align-items: center;
   padding: 1.5rem;
   border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
 }
 
 .modal-header h2 {
@@ -63,6 +66,8 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .form-row {
@@ -123,4 +128,25 @@
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1rem;
+  position: sticky;
+  bottom: 0;
+  padding-top: 1rem;
+  padding-bottom: 0.25rem;
+  background-color: var(--color-bg-elevated);
+}
+
+@media (max-width: 480px) {
+  .modal-content.project-modal {
+    width: calc(100% - 2rem);
+    max-height: calc(100vh - 2rem);
+  }
+
+  .modal-header,
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 }

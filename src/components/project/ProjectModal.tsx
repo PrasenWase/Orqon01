@@ -23,6 +23,21 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) =
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [error, setError] = useState('');
 
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setStatus('healthy');
+    setPriority('medium');
+    setDeadline('');
+    setSelectedUsers([]);
+    setError('');
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
@@ -43,16 +58,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) =
 
     addProject(newProject);
     
-    // Reset form
-    setTitle('');
-    setDescription('');
-    setStatus('healthy');
-    setPriority('medium');
-    setDeadline('');
-    setSelectedUsers([]);
-    setError('');
-    
-    onClose();
+    handleClose();
   };
 
   const toggleUser = (userId: string) => {
@@ -70,7 +76,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) =
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleClose}
           />
           <motion.div
             className="modal-content project-modal"
@@ -80,7 +86,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) =
           >
             <div className="modal-header">
               <h2>New Project</h2>
-              <button className="modal-close" onClick={onClose}><X size={20} /></button>
+              <button className="modal-close" onClick={handleClose} aria-label="Close new project modal"><X size={20} /></button>
             </div>
             
             <form onSubmit={handleSubmit} className="modal-body">
@@ -149,7 +155,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose }) =
               </div>
 
               <div className="modal-actions">
-                <Button variant="secondary" onClick={onClose} type="button">Cancel</Button>
+                <Button variant="secondary" onClick={handleClose} type="button">Cancel</Button>
                 <Button variant="primary" type="submit">Create Project</Button>
               </div>
             </form>
